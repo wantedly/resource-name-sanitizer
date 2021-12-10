@@ -68,12 +68,12 @@ func TestSanitize_SubdomainLabelSafe(t *testing.T) {
 		{
 			name: "trim latest special character",
 			test: "some-string%",
-			want: "some-string",
+			want: "some-string-71ea0770",
 		},
 		{
 			name: "replace special characters",
 			test: "some/string%included*special&characters",
-			want: "some-string-included-special-characters",
+			want: "some-string-included-special-characters-0c185f7f",
 		},
 		{
 			name: "long string will be trimmed",
@@ -93,7 +93,7 @@ func TestSanitize_SubdomainLabelSafe(t *testing.T) {
 		{
 			name: "return same string when it gets acceptable string",
 			test: "some/string-value%",
-			want: "some-string-value",
+			want: "some-string-value-da63b7d2",
 		},
 		{
 			name: "long string has special characters",
@@ -103,17 +103,14 @@ func TestSanitize_SubdomainLabelSafe(t *testing.T) {
 		{
 			name: "can be join and sanitize special case",
 			test: "some/string%-included*special-&characters",
-			want: "some-string-included-special-characters",
+			want: "some-string-included-special-characters-8622b7b7",
 		},
 	}
 
 	s := sanitizer.NewSubdomainLabelSafe()
 	for _, testcase := range testcases {
 		t.Run(testcase.name, func(t *testing.T) {
-			got, err := s.Sanitize(testcase.test)
-			if err != nil {
-				t.Fatalf("err: %v", err)
-			}
+			got := s.Sanitize(testcase.test)
 			if testcase.want != got {
 				t.Errorf("test: %s and want: %s, got: %s", testcase.test, testcase.want, got)
 			}
