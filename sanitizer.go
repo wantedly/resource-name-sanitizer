@@ -10,7 +10,7 @@ import (
 
 type Sanitizer interface {
 	IsValid(string) bool
-	SanitizeString(string) (string, error)
+	Sanitize(string) (string, error)
 	SanitizeStrings(...string) (string, error)
 }
 
@@ -50,7 +50,7 @@ func (s *sanitizer) IsValid(str string) bool {
 	return true
 }
 
-func (s *sanitizer) SanitizeString(token string) (string, error) {
+func (s *sanitizer) Sanitize(token string) (string, error) {
 	if s.IsValid(token) {
 		return token, nil
 	}

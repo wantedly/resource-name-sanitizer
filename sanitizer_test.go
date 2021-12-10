@@ -49,7 +49,7 @@ func TestIsValidSubdomainLabelSafe(t *testing.T) {
 	}
 }
 
-func TestSanitizeStringSubdomainLabelSafe(t *testing.T) {
+func TestSanitize_SubdomainLabelSafe(t *testing.T) {
 	testcases := []struct {
 		name string
 		test string
@@ -85,7 +85,7 @@ func TestSanitizeStringSubdomainLabelSafe(t *testing.T) {
 	s := sanitizer.NewSubdomainLabelSafe()
 	for _, testcase := range testcases {
 		t.Run(testcase.name, func(t *testing.T) {
-			got, err := s.SanitizeString(testcase.test)
+			got, err := s.Sanitize(testcase.test)
 			if err != nil {
 				t.Fatalf("err: %v", err)
 			}
