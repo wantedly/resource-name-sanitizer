@@ -12,7 +12,7 @@ import (
 
 type Sanitizer interface {
 	IsValid(string) bool
-	Sanitize(...string) (string, error)
+	Sanitize(string) (string, error)
 }
 
 // sanitizer will check given string by acceptablePattern.
@@ -59,8 +59,7 @@ func (s *sanitizer) IsValid(str string) bool {
 // Sanitize returns a `valid` string.
 // If the given string is valid, return it.
 // Otherwise, it will try to concatenate the strings matching the validationPattern with the separator to make a valid string.
-func (s *sanitizer) Sanitize(tokens ...string) (string, error) {
-	token := strings.Join(tokens, s.separator)
+func (s *sanitizer) Sanitize(token string) (string, error) {
 	if s.IsValid(token) {
 		return token, nil
 	}
