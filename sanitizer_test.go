@@ -98,7 +98,12 @@ func TestSanitize_SubdomainLabelSafe(t *testing.T) {
 		{
 			name: "long string has special characters",
 			test: []string{"some%long", "characters*string", "abcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefg"},
-			want: "some-long-characters-string-abcdefgabcdefgabcdefgabcde-5c75d198",
+			want: "some-long-characters-string-abcdefgabcdefgabcdefgabcde-537aa79b",
+		},
+		{
+			name: "can be join and sanitize special case",
+			test: []string{"some/string%", "included*special", "&characters"},
+			want: "some-string-included-special-characters",
 		},
 	}
 
