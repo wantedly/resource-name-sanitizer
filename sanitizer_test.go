@@ -52,45 +52,60 @@ func TestIsValidSubdomainLabelSafe(t *testing.T) {
 func TestSanitize_SubdomainLabelSafe(t *testing.T) {
 	testcases := []struct {
 		name string
-		test string
+		test []string
 		want string
 	}{
 		{
 			name: "return same string when it gets acceptable string",
-			test: "somestring",
+			test: []string{"somestring"},
 			want: "somestring",
 		},
 		{
 			name: "accept dash between characters",
-			test: "some-string",
+			test: []string{"some-string"},
 			want: "some-string",
 		},
 		{
 			name: "trim latest special character",
-			test: "some-string%",
+			test: []string{"some-string%"},
 			want: "some-string",
 		},
 		{
 			name: "replace special characters",
-			test: "some/string%included*special&characters",
+			test: []string{"some/string%included*special&characters"},
 			want: "some-string-included-special-characters",
 		},
 		{
 			name: "long string will be trimmed",
-			test: "some-long-characters-string-abcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefg",
-			want: "some-long-characters-string-abcdefgabcdefgabcdefgabcdefgabcdefg",
+			test: []string{"some-long-characters-string-abcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefg"},
+			want: "some-long-characters-string-abcdefgabcdefgabcdefgabcde-5c75d198",
 		},
 		{
 			name: "long string has special characters will be trimmed and replaced",
-			test: "some%long/characters*string$abcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefg",
-			want: "some-long-characters-string-abcdefgabcdefgabcdefgabcdefgabcdefg",
+			test: []string{"some%long/characters*string$abcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefg"},
+			want: "some-long-characters-string-abcdefgabcdefgabcdefgabcde-b43b67da",
+		},
+		{
+			name: "join valid strings",
+			test: []string{"some", "string"},
+			want: "some-string",
+		},
+		{
+			name: "return same string when it gets acceptable string",
+			test: []string{"some/string", "value%"},
+			want: "some-string-value",
+		},
+		{
+			name: "long string has special characters",
+			test: []string{"some%long", "characters*string", "abcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefg"},
+			want: "some-long-characters-string-abcdefgabcdefgabcdefgabcde-5c75d198",
 		},
 	}
 
 	s := sanitizer.NewSubdomainLabelSafe()
 	for _, testcase := range testcases {
 		t.Run(testcase.name, func(t *testing.T) {
-			got, err := s.Sanitize(testcase.test)
+			got, err := s.Sanitize(testcase.test...)
 			if err != nil {
 				t.Fatalf("err: %v", err)
 			}
