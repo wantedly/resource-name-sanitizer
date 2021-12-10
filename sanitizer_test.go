@@ -86,16 +86,6 @@ func TestSanitize_SubdomainLabelSafe(t *testing.T) {
 			want: "some-long-characters-string-abcdefgabcdefgabcdefgabcde-b43b67da",
 		},
 		{
-			name: "join valid strings",
-			test: "some-string",
-			want: "some-string",
-		},
-		{
-			name: "return same string when it gets acceptable string",
-			test: "some/string-value%",
-			want: "some-string-value-da63b7d2",
-		},
-		{
 			name: "long string has special characters",
 			test: "some%long-characters*string-abcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefg",
 			want: "some-long-characters-string-abcdefgabcdefgabcdefgabcde-537aa79b",
