@@ -34,6 +34,7 @@ func NewSubdomainLabelSafe() Sanitizer {
 	}
 }
 
+// NewSanitizerWithConfig can be used to set the config values.
 func NewSanitizerWithConfig(pattern, validation, separator string, length int) Sanitizer {
 	return &sanitizer{
 		acceptablePattern: regexp.MustCompile(pattern),
