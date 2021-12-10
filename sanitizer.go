@@ -11,7 +11,7 @@ type sanitizer struct {
 	maxLength         int
 }
 
-func NewSanitizer() Sanitizer {
+func NewSubdomainLabelSafe() Sanitizer {
 	return &sanitizer{
 		acceptablePattern: regexp.MustCompile(`^[a-z0-9][a-z0-9-]+[a-z0-9]$`),
 		maxLength:         63,
