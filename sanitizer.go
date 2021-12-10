@@ -68,9 +68,7 @@ func (s *sanitizer) Sanitize(token string) string {
 	}
 
 	validatedName := strings.Join(validatedTokens, s.separator)
-	validatedNameWithHash := s.addHash(token, validatedName)
-
-	return validatedNameWithHash
+	return s.addHash(token, validatedName)
 }
 
 // addHash returns string which is like `str-hash(raw)`
