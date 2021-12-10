@@ -6,7 +6,7 @@ import (
 	"github.com/wantedly/resource-name-sanitizer"
 )
 
-func TestIsValidDefault(t *testing.T) {
+func TestIsValidSubdomainLabelSafe(t *testing.T) {
 	testcases := []struct {
 		name       string
 		testString string
@@ -34,7 +34,7 @@ func TestIsValidDefault(t *testing.T) {
 		},
 	}
 
-	s := sanitizer.NewSanitizer()
+	s := sanitizer.NewSubdomainLabelSafe()
 	for _, testcase := range testcases {
 		t.Run(testcase.name, func(t *testing.T) {
 			if got := s.IsValid(testcase.testString); got != testcase.want {
