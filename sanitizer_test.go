@@ -32,6 +32,11 @@ func TestIsValidSubdomainLabelSafe(t *testing.T) {
 			testString: "some-long-64-characters-string-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
 			want:       false,
 		},
+		{
+			name:       "doesn't accept special character like slash",
+			testString: "some/string",
+			want:       false,
+		},
 	}
 
 	s := sanitizer.NewSubdomainLabelSafe()
@@ -98,6 +103,8 @@ func TestIsValidWithConfig(t *testing.T) {
 	testcases := []struct {
 		name       string
 		pattern    string
+		validator  string
+		separator  string
 		length     int
 		testString string
 		want       bool
@@ -105,6 +112,8 @@ func TestIsValidWithConfig(t *testing.T) {
 		{
 			name:       "accept lowercase",
 			pattern:    `^[a-z0-9][a-z0-9-]+[a-z0-9]$`,
+			validator:  `[a-z0-9]`,
+			separator:  "-",
 			length:     64,
 			testString: "somestring",
 			want:       true,
@@ -112,6 +121,8 @@ func TestIsValidWithConfig(t *testing.T) {
 		{
 			name:       "accept only 1 alphabet",
 			pattern:    `[a-z]`,
+			validator:  `[a-z]`,
+			separator:  "",
 			length:     64,
 			testString: "a",
 			want:       true,
@@ -119,6 +130,8 @@ func TestIsValidWithConfig(t *testing.T) {
 		{
 			name:       "accept only 1 alphabet",
 			pattern:    `[a-z]`,
+			validator:  `[a-z]`,
+			separator:  "",
 			length:     64,
 			testString: "1",
 			want:       false,
@@ -127,7 +140,7 @@ func TestIsValidWithConfig(t *testing.T) {
 
 	for _, testcase := range testcases {
 		t.Run(testcase.name, func(t *testing.T) {
-			s := sanitizer.NewSanitizerWithConfig(testcase.pattern, testcase.length)
+			s := sanitizer.NewSanitizerWithConfig(testcase.pattern, testcase.validator, testcase.separator, testcase.length)
 			if got := s.IsValid(testcase.testString); got != testcase.want {
 				t.Errorf("test: %s and want: %t, got %t", testcase.testString, testcase.want, got)
 			}
