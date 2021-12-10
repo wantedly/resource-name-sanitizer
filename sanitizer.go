@@ -1,9 +1,17 @@
 package sanitizer
 
-import "regexp"
+import (
+	"fmt"
+	"hash/fnv"
+	"io"
+	"regexp"
+	"strings"
+)
 
 type Sanitizer interface {
 	IsValid(string) bool
+	SanitizeString(string) (string, error)
+	SanitizeStrings(...string) (string, error)
 }
 
 type sanitizer struct {
@@ -40,4 +48,39 @@ func (s *sanitizer) IsValid(str string) bool {
 	}
 
 	return true
+}
+
+func (s *sanitizer) SanitizeString(token string) (string, error) {
+	if s.IsValid(token) {
+		return token, nil
+	}
+
+	validWords := s.validationPattern.FindAllStringSubmatch(token, -1)
+	var validatedNames []string
+	for _, w := range validWords {
+		validatedNames = append(validatedNames, w[0])
+	}
+
+	validatedName := strings.Join(validatedNames, s.separator)
+
+	if s.maxLength < len(validatedName) {
+		validatedName = validatedName[:s.maxLength]
+	}
+	return validatedName, nil
+}
+
+func (s *sanitizer) SanitizeStrings(tokens ...string) (string, error) {
+	token := strings.Join(tokens, s.separator)
+	if s.IsValid(token) {
+		return token, nil
+	}
+	return token, nil
+}
+
+func GetHash(str string) (string, error) {
+	h := fnv.New32a()
+	if _, err := io.WriteString(h, str); err != nil {
+		return "", err
+	}
+	return fmt.Sprintf("%x", h.Sum(nil)), nil
 }
