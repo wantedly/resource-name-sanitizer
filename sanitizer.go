@@ -13,7 +13,7 @@ import (
 type Sanitizer interface {
 	IsValid(string) bool
 	Sanitize(string) (string, error)
-	ConcatStrings(...string) (string, error)
+	Join(...string) (string, error)
 }
 
 // sanitizer will check given string by acceptablePattern.
@@ -78,16 +78,51 @@ func (s *sanitizer) Sanitize(token string) (string, error) {
 	return validatedName, nil
 }
 
-// ConcatStrings returns a `valid` string by given strings.
-func (s *sanitizer) ConcatStrings(tokens ...string) (string, error) {
+// Join returns a `valid` string by given strings.
+// If the string is too long, it will be trimmed to the maximum length.
+//   In this case, hash is appended to the end to prevent duplication.
+func (s *sanitizer) Join(tokens ...string) (string, error) {
 	token := strings.Join(tokens, s.separator)
 	if s.IsValid(token) {
 		return token, nil
 	}
-	return token, nil
+
+	matches := s.validationPattern.FindAllStringSubmatch(token, -1)
+	var validatedTokens []string
+	for _, w := range matches {
+		validatedTokens = append(validatedTokens, w[0])
+	}
+
+	// if validatedName is short enough, return it
+	validatedName := strings.Join(validatedTokens, s.separator)
+	if len(validatedName) < s.maxLength {
+		return validatedName, nil
+	}
+
+	validatedNameWithHash, err := s.addHash(validatedName)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to add Hash")
+	}
+	return validatedNameWithHash, nil
 }
 
-func GetHash(str string) (string, error) {
+func (s *sanitizer) addHash(str string) (string, error) {
+	// currently, use fnv.New32a() and it returns as 8 characters
+	hashLen := 8
+	// support when the maxLength is too short
+	if s.maxLength < hashLen {
+		hashLen = s.maxLength / 2
+	}
+
+	hash, err := getHash(str)
+	if err != nil {
+		return "", errors.Wrap(err, "failed to get hash")
+	}
+
+	return fmt.Sprintf("%s%s%s", str[:(s.maxLength-hashLen-1)], s.separator, hash[:hashLen]), nil
+}
+
+func getHash(str string) (string, error) {
 	h := fnv.New32a()
 	if _, err := io.WriteString(h, str); err != nil {
 		return "", err
