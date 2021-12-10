@@ -104,6 +104,51 @@ func TestSanitize_SubdomainLabelSafe(t *testing.T) {
 	}
 }
 
+func TestJoin_SubdomainLabelSafe(t *testing.T) {
+	testcases := []struct {
+		name string
+		test []string
+		want string
+	}{
+		{
+			name: "return same string when it gets acceptable string",
+			test: []string{"somestring"},
+			want: "somestring",
+		},
+		{
+			name: "return same string when it gets acceptable string",
+			test: []string{"some", "string"},
+			want: "some-string",
+		},
+		{
+			name: "return same string when it gets acceptable string",
+			test: []string{"some/string", "value%"},
+			want: "some-string-value",
+		},
+		{
+			name: "long string has special characters",
+			test: []string{"some%long", "characters*string", "abcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefg"},
+			want: "some-long-characters-string-abcdefgabcdefgabcdefgabcde-5c75d198",
+		},
+	}
+
+	s := sanitizer.NewSubdomainLabelSafe()
+	for _, testcase := range testcases {
+		t.Run(testcase.name, func(t *testing.T) {
+			got, err := s.Join(testcase.test...)
+			if err != nil {
+				t.Fatalf("err: %v", err)
+			}
+			if testcase.want != got {
+				t.Errorf("test: %v and want: %s, got: %s", testcase.test, testcase.want, got)
+			}
+			if !s.IsValid(got) {
+				t.Errorf("got: %s is not valid", got)
+			}
+		})
+	}
+}
+
 func TestIsValidWithConfig(t *testing.T) {
 	testcases := []struct {
 		name       string
