@@ -8,19 +8,25 @@ type Sanitizer interface {
 
 type sanitizer struct {
 	acceptablePattern *regexp.Regexp
+	validationPattern *regexp.Regexp
+	separator         string
 	maxLength         int
 }
 
 func NewSubdomainLabelSafe() Sanitizer {
 	return &sanitizer{
 		acceptablePattern: regexp.MustCompile(`^[a-z0-9][a-z0-9-]+[a-z0-9]$`),
+		validationPattern: regexp.MustCompile(`[a-z0-9]*`),
+		separator:         "-",
 		maxLength:         63,
 	}
 }
 
-func NewSanitizerWithConfig(pattern string, length int) Sanitizer {
+func NewSanitizerWithConfig(pattern, validation, separator string, length int) Sanitizer {
 	return &sanitizer{
 		acceptablePattern: regexp.MustCompile(pattern),
+		validationPattern: regexp.MustCompile(validation),
+		separator:         separator,
 		maxLength:         length,
 	}
 }
