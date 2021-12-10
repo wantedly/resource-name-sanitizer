@@ -6,6 +6,8 @@ import (
 	"io"
 	"regexp"
 	"strings"
+
+	"github.com/pkg/errors"
 )
 
 type Sanitizer interface {
@@ -27,7 +29,7 @@ type sanitizer struct {
 func NewSubdomainLabelSafe() Sanitizer {
 	return &sanitizer{
 		acceptablePattern: regexp.MustCompile(`^[a-z0-9][a-z0-9-]+[a-z0-9]$`),
-		validationPattern: regexp.MustCompile(`[a-z0-9]*`),
+		validationPattern: regexp.MustCompile(`[a-z0-9]+`),
 		separator:         "-",
 		maxLength:         63,
 	}
