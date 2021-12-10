@@ -61,8 +61,13 @@ func TestSanitize_SubdomainLabelSafe(t *testing.T) {
 			want: "somestring",
 		},
 		{
-			name: "",
+			name: "accept dash between characters",
 			test: "some-string",
+			want: "some-string",
+		},
+		{
+			name: "trim latest special character",
+			test: "some-string%",
 			want: "some-string",
 		},
 		{
@@ -71,12 +76,12 @@ func TestSanitize_SubdomainLabelSafe(t *testing.T) {
 			want: "some-string-included-special-characters",
 		},
 		{
-			name: "long string",
+			name: "long string will be trimmed",
 			test: "some-long-characters-string-abcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefg",
 			want: "some-long-characters-string-abcdefgabcdefgabcdefgabcdefgabcdefg",
 		},
 		{
-			name: "long string has special characters",
+			name: "long string has special characters will be trimmed and replaced",
 			test: "some%long/characters*string$abcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefgabcdefg",
 			want: "some-long-characters-string-abcdefgabcdefgabcdefgabcdefgabcdefg",
 		},
